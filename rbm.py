@@ -1,5 +1,8 @@
 """
 PyTorch implementation of all (Bernoulli, Gaussian hid, Gaussian vis+hid) kinds of RBMs.
+
+(C) Kai Xu
+University of Edinburgh, 2017
 """
 
 
