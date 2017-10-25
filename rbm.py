@@ -1,9 +1,5 @@
 """
 PyTorch implementation of all (Bernoulli, Gaussian hid, Gaussian vis+hid) kinds of RBMs.
-
-Reference
-
-    [1] Hinton, Geoffrey E. "A practical guide to training restricted boltzmann machines." Neural networks: Tricks of the trade. Springer Berlin Heidelberg, 2012. 599-619.
 """
 
 
@@ -25,7 +21,6 @@ class RBMBase:
         self.params = dict()
 
         self.w = torch.randn(vis_num, hid_num) * 0.1    # weight matrix
-        # TODO: provide an init of a based on data; 24.8 of [1]
         self.a = torch.zeros(vis_num) / vis_num         # bias for visiable units
         self.b = torch.zeros(hid_num)                   # bias for hidden units
 
