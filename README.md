@@ -19,7 +19,6 @@ rbm_2.cd(data)
 - [x] RBM with Bernoulli units
 - [x] RBM with Gaussian hidden units
 - [ ] RBM with Gaussian visible and hidden units
-- [ ] Allow customized mu and sigma
 - [ ] Provide customized initialization for bias of visible units
   - Ref: Section 24.8 of Hinton12
 
