@@ -24,15 +24,15 @@ class RBMBase:
         # Dictionary for storing parameters
         self.params = dict()
 
-        self.w = torch.randn(vis_num, hid_num) * 0.01   # weight matrix
+        self.w = torch.randn(vis_num, hid_num) * 0.1    # weight matrix
         # TODO: provide an init of a based on data; 24.8 of [1]
-        self.a = torch.ones(vis_num) / vis_num          # bias for visiable units
+        self.a = torch.zeros(vis_num) / vis_num         # bias for visiable units
         self.b = torch.zeros(hid_num)                   # bias for hidden units
 
         # Corresponding momentums; _v means velocity of
-        self.w_v = torch.randn(vis_num, hid_num)
-        self.a_v = torch.ones(vis_num)
-        self.b_v = torch.ones(hid_num)
+        self.w_v = torch.zeros(vis_num, hid_num)
+        self.a_v = torch.zeros(vis_num)
+        self.b_v = torch.zeros(hid_num)
 
         if torch.cuda.is_available():
 
@@ -124,7 +124,7 @@ class RBMBase:
         self.b = self.b + self.b_v
 
         # Compute reconstruction error
-        error = F.mse_loss(v_data, v_prob_neg)
+        error = F.mse_loss(v_data, v_prob_neg, size_average=False)
 
         return error
 
@@ -148,6 +148,27 @@ class RBMBer(RBMBase):
         h_prob = self.p_h_given_v(v)
 
         return (h_prob > r).float(), h_prob
+
+    def p_v_given_h(self, h):
+
+        return torch.sigmoid(torch.matmul(h, self.w.t()) + self.a)
+
+
+class RBMGaussHid(RBMBase):
+
+    def __init__(self, vis_num, hid_num):
+
+        RBMBase.__init__(self, vis_num, hid_num)
+
+    def p_h_given_v(self, v):
+
+        return torch.matmul(v, self.w) + self.b
+
+    def sample_h_given_v(self, v):
+
+        h_prob = self.p_h_given_v(v)
+
+        return (h_prob + torch.randn(h_prob.size())), h_prob
 
     def p_v_given_h(self, h):
 
