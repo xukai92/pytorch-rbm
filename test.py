@@ -25,7 +25,21 @@ v_data = torch.randn(50, 25)
 
 for _ in range(100):
 
-    error = rbm_2.cd(v_data, 1, 5e-2, alpha=5e-1, lam=1e-4)
+    error = rbm_2.cd(v_data)
+
+    print("Reconstruction error: %.3f" % (error.data[0]))
+
+print("[rbm.test] done.")
+
+print("[rbm.test] testing RBMGaussHid...")
+
+rbm_3 = RBMGaussHid(25, 5)
+
+v_data = torch.randn(50, 25)
+
+for _ in range(100):
+
+    error = rbm_3.cd(v_data)
 
     print("Reconstruction error: %.3f" % (error.data[0]))
 

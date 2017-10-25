@@ -1,5 +1,5 @@
 """
-PyTorch implementation of all (Bernoulli, Gaussian hid, Gaussian vis+hid) kindS of RBMs.
+PyTorch implementation of all (Bernoulli, Gaussian hid, Gaussian vis+hid) kinds of RBMs.
 
 Reference
 
@@ -73,7 +73,7 @@ class RBMBase:
 
         raise NotImplementedError()
 
-    def cd(self, v_data, k, eta, alpha=5e-1, lam=1e-4):
+    def cd(self, v_data, k, eta, alpha, lam):
         """
         Perform contrastive divergence with k stpes, i.e. CD_k.
 
@@ -141,17 +141,21 @@ class RBMBer(RBMBase):
 
     def sample_h_given_v(self, v):
 
+        h_prob = self.p_h_given_v(v)
+
         r = torch.rand(self.hid_num)
         if self.has_gpu:
             r = r.cuda(self.gpu_id)
-
-        h_prob = self.p_h_given_v(v)
 
         return (h_prob > r).float(), h_prob
 
     def p_v_given_h(self, h):
 
         return torch.sigmoid(torch.matmul(h, self.w.t()) + self.a)
+
+    def cd(self, v_data, k=1, eta=0.02, alpha=0.9, lam=0.0):
+
+        return RBMBase.cd(self, v_data, k, eta, alpha, lam)
 
 
 class RBMGaussHid(RBMBase):
@@ -168,8 +172,16 @@ class RBMGaussHid(RBMBase):
 
         h_prob = self.p_h_given_v(v)
 
-        return (h_prob + torch.randn(h_prob.size())), h_prob
+        r = torch.randn(h_prob.size())
+        if self.has_gpu:
+            r = r.cuda(self.gpu_id)
+
+        return (h_prob + r), h_prob
 
     def p_v_given_h(self, h):
 
         return torch.sigmoid(torch.matmul(h, self.w.t()) + self.a)
+
+    def cd(self, v_data, k=1, eta=0.001, alpha=0.5, lam=0.0002):
+
+        return RBMBase.cd(self, v_data, k, eta, alpha, lam)
