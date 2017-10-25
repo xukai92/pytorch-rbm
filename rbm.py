@@ -1,9 +1,9 @@
 """
-PyTorch implementation of all (Bernoulli, Gaussian hid, Gaussian vis+hid) kind of RBMs.
+PyTorch implementation of all (Bernoulli, Gaussian hid, Gaussian vis+hid) kindS of RBMs.
 
 Reference
 
-Hinton, Geoffrey E. "A practical guide to training restricted boltzmann machines." Neural networks: Tricks of the trade. Springer Berlin Heidelberg, 2012. 599-619.
+    Hinton, Geoffrey E. "A practical guide to training restricted boltzmann machines." Neural networks: Tricks of the trade. Springer Berlin Heidelberg, 2012. 599-619.
 """
 
 
@@ -11,7 +11,7 @@ import torch
 import torch.nn.functional as F
 
 
-class RBM:
+class RBMBase:
 
     def __init__(self, vis_num, hid_num):
         """
@@ -24,20 +24,20 @@ class RBM:
         # Dictionary for storing parameters
         self.params = dict()
 
-        w = torch.randn(vis_num, hid_num)  # weight matrix
-        a = torch.ones(vis_num)            # bias for visiable units
-        b = torch.ones(hid_num)            # bias for hidden units
+        self.w = torch.randn(vis_num, hid_num)  # weight matrix
+        self.a = torch.ones(vis_num)            # bias for visiable units
+        self.b = torch.ones(hid_num)            # bias for hidden units
 
         # Corresponding momentums
-        w_m = torch.randn(vis_num, hid_num)
-        a_m = torch.ones(vis_num)
-        b_m = torch.ones(hid_num)
+        self.w_m = torch.randn(vis_num, hid_num)
+        self.a_m = torch.ones(vis_num)
+        self.b_m = torch.ones(hid_num)
 
         if torch.cuda.is_available():
 
             gpu_id = torch.cuda.current_device()
 
-            params = (w, a, b, w_m, a_m, b_m)
+            params = (self.w, self.a, self.b, self.w_m, self.a_m, self.b_m)
             
             for p in params:
 
@@ -106,3 +106,18 @@ class RBM:
         error = F.mse_loss(v_data, v_prob_neg)
 
         return error
+
+
+class RBMBer(RBMBase):
+
+    def __init__(self, vis_num, hid_num):
+
+        RBMBase.__init__(self, vis_num, hid_num)
+
+    def p_h_given_v(self, v):
+
+        return torch.sigmoid(torch.matmul(v, self.w) + self.b)
+
+    def p_v_given_h(self, h):
+
+        return torch.sigmoid(torch.matmul(h, self.w.t()) + self.a)
