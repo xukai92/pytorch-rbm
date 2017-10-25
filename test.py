@@ -19,8 +19,15 @@ print("[rbm.test] done.")
 
 print("[rbm.test] testing RBMBer...")
 
-rbm_2 = RBMBer(10, 10)
-rbm_2.cd(torch.rand(2, 10), 1, 1e-3, 1e-2, 5e-1)
+rbm_2 = RBMBer(25, 5)
+
+v_data = torch.randn(50, 25)
+
+for _ in range(100):
+
+    error = rbm_2.cd(v_data, 1, 5e-2, alpha=5e-1, lam=1e-4)
+
+    print("Reconstruction error: %.3f" % (error.data[0]))
 
 print("[rbm.test] done.")
 
